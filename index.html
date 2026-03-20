@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Eid Mubarak 🌙</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --gold:#F0A830;--terra:#C96B3A;--amber:#E8832A;
+  --cream:#FFF8EE;--warm:#FFFBF4;--brown:#3D2B1F;
+  --teal:#1FA896;--rose:#E87FA0;
+  --sky1:#F5C840;--sky2:#FDEBC8;
+  --gr1:#8BAA6A;--gr2:#6B8A4A;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  font-family:'Fredoka One',cursive;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  user-select:none;
+}
+
+/* SCREENS */
+.screen{position:fixed;inset:0;display:none;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+
+/* KEYFRAMES */
+@keyframes lswing{0%,100%{transform:rotate(-9deg)}50%{transform:rotate(9deg)}}
+@keyframes mfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes gfloat{0%,100%{transform:translateY(0) rotate(var(--r,0deg))}50%{transform:translateY(-13px) rotate(calc(var(--r,0deg)+6deg))}}
+@keyframes enterR{from{opacity:0;transform:translateX(50px) scale(.9)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes exitL{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-60px)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-14px)}70%{transform:translateY(-4px)}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-7deg)}75%{transform:rotate(7deg)}}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes npulse{0%,100%{box-shadow:0 3px 0 rgba(140,50,15,.4),0 0 0 0 rgba(201,107,58,.38)}50%{box-shadow:0 3px 0 rgba(140,50,15,.4),0 0 0 6px rgba(201,107,58,0)}}
+@keyframes fwburst{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--fx),var(--fy))}}
+@keyframes twinkle{0%,100%{opacity:.45}50%{opacity:.1}}
+@keyframes finFam{from{opacity:0;transform:scale(.9) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+.lsw{transform-origin:50% 0%;animation:lswing 3.5s ease-in-out infinite}
+.lsw:nth-child(2){animation-delay:-1.2s}
+.lsw:nth-child(3){animation-delay:-2.4s}
+.mflt{animation:mfloat 4s ease-in-out infinite}
+.geo{position:absolute;pointer-events:none;animation:gfloat var(--d,5s) var(--dl,0s) ease-in-out infinite}
+.star{position:absolute;pointer-events:none;color:var(--terra);font-size:var(--fs,1rem);opacity:.4;animation:twinkle var(--d,3.5s) var(--dl,0s) ease-in-out infinite}
+
+
+/* ═══════════════════════════════════
+   INTRO
+═══════════════════════════════════ */
+#intro{
+  align-items:center;justify-content:center;
+  background:linear-gradient(160deg,var(--sky1) 0%,var(--sky2) 55%,#FFE09A 100%);
+  z-index:30;
+}
+.i-lants{position:absolute;top:0;left:50%;transform:translateX(-50%);display:flex;gap:80px;pointer-events:none;z-index:2}
+.i-moon{position:absolute;top:11%;right:7%;filter:drop-shadow(0 0 20px rgba(240,168,48,.65));z-index:2}
+.i-title{font-size:clamp(2.8rem,12vw,5rem);color:var(--terra);text-align:center;line-height:1.05;z-index:3;text-shadow:3px 4px 0 rgba(180,60,20,.18);padding:0 16px}
+.i-sub{font-family:'Nunito',sans-serif;font-weight:800;color:rgba(61,43,31,.52);font-size:clamp(.88rem,3.5vw,1.1rem);text-align:center;margin-top:10px;z-index:3;padding:0 26px}
+.i-btn{
+  margin-top:36px;padding:16px 20px;z-index:3;
+  background:linear-gradient(135deg,#C96B3A,#E8832A);
+  border:none;border-radius:60px;color:#fff;
+  font-family:'Fredoka One',cursive;font-size:1.3rem;cursor:pointer;
+  box-shadow:0 6px 0 rgba(140,50,15,.38),0 10px 26px rgba(200,100,50,.3);
+  -webkit-appearance:none;transition:transform .12s,box-shadow .12s;
+}
+.i-btn:active{transform:translateY(3px);box-shadow:0 3px 0 rgba(140,50,15,.38)}
+
+
+/* ═══════════════════════════════════
+   SCENE  –  simple vertical stack:
+   [SKY]    fixed height header
+   [BUBBLE] flex auto, shrinks to content
+   [STAGE]  flex 1, fills rest
+═══════════════════════════════════ */
+#scene{
+  background:linear-gradient(to bottom,
+    var(--sky1) 0%,var(--sky2) 40%,
+    #C8DDB0 65%,var(--gr1) 100%);
+  z-index:20;
+}
+
+/* SKY BAR */
+#sky{
+  flex:0 0 auto;
+  height:100px;
+  position:relative;overflow:hidden;
+}
+#s-lants{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  display:flex;gap:min(64px,16vw);pointer-events:none;
+}
+#s-moon{
+  position:absolute;top:10px;right:min(40px,9vw);
+  animation:mfloat 4s ease-in-out infinite;
+}
+#dots{
+  position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  display:flex;gap:9px;z-index:5;
+}
+.dot{width:9px;height:9px;border-radius:50%;background:rgba(61,43,31,.13);border:2px solid rgba(61,43,31,.14);transition:all .38s}
+.dot.active{background:var(--terra);border-color:var(--terra);box-shadow:0 0 0 3px rgba(201,107,58,.2)}
+.dot.done{background:rgba(201,107,58,.35);border-color:rgba(201,107,58,.28)}
+
+/* BUBBLE ZONE */
+#bubble-zone{
+  flex:0 0 auto;
+  padding:6px 14px 4px;
+  opacity:0;transition:opacity .28s;
+}
+.bcard{
+  background:var(--warm);border-radius:18px;
+  padding:11px 14px 10px;
+  border:1.5px solid rgba(201,107,58,.16);
+  box-shadow:0 4px 18px rgba(61,43,31,.09);
+  position:relative;
+}
+/* tail pointing DOWN toward character */
+.bcard::after{
+  content:'';position:absolute;
+  bottom:-13px;left:50%;transform:translateX(-50%);
+  border:12px solid transparent;
+  border-top-color:var(--warm);border-bottom:0;
+}
+.bname{font-size:.6rem;font-family:'Nunito',sans-serif;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--terra);margin-bottom:3px}
+#btxt{font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;color:var(--brown);line-height:1.55;min-height:34px}
+#btxt.caret::after{content:'|';color:var(--terra);animation:blink .55s step-end infinite}
+#msays{
+  display:none;
+  font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:800;color:var(--terra);
+  background:rgba(201,107,58,.08);border:1.5px solid rgba(201,107,58,.2);
+  border-radius:10px;padding:5px 11px;margin-top:6px;text-align:center;
+}
+#msays.show{display:block;animation:slideUp .28s ease}
+#msays::before{content:'✨ Aap ne kaha:  ';font-size:.54rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(61,43,31,.38)}
+.bfoot{display:flex;justify-content:flex-end;margin-top:7px}
+#nxtbtn{
+  display:none;align-items:center;gap:4px;
+  background:var(--terra);border:none;border-radius:40px;
+  padding:6px 18px;color:#fff;
+  font-family:'Fredoka One',cursive;font-size:.9rem;cursor:pointer;
+  box-shadow:0 3px 0 rgba(140,50,15,.38);
+  animation:npulse 1.6s ease-in-out infinite;
+  -webkit-appearance:none;
+}
+#nxtbtn.show{display:flex}
+#nxtbtn:active{transform:translateY(2px)}
+
+/* STAGE — fills remaining height, flex column, bottom-aligned */
+#stage{
+  flex:1;min-height:0;
+  display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
+  position:relative;overflow:hidden;
+}
+
+/* Character wraps naturally above carpet */
+#char-wrap{
+  position:relative;z-index:5;
+  display:flex;justify-content:center;
+}
+#char-wrap svg{display:block}
+
+/* Name chip */
+#chip{
+  font-family:'Nunito',sans-serif;font-weight:900;
+  font-size:.56rem;letter-spacing:.11em;text-transform:uppercase;color:var(--terra);
+  white-space:nowrap;
+  background:rgba(255,251,240,.93);padding:2px 10px;border-radius:20px;
+  border:1.5px solid rgba(201,107,58,.18);
+  opacity:0;transition:opacity .36s;
+  text-align:center;margin-bottom:2px;z-index:5;
+}
+#chip.vis{opacity:1}
+
+/* Carpet */
+#carpet{
+  width:min(260px,72vw);
+  height:56px;
+  background:linear-gradient(to bottom,#C96B3A,#A85528);
+  border-radius:7px 7px 0 0;
+  border:2px solid rgba(240,168,48,.34);border-bottom:none;
+  position:relative;z-index:4;overflow:hidden;flex-shrink:0;
+}
+#carpet::before{content:'';position:absolute;inset:6px;border:1.5px solid rgba(240,168,48,.22);border-radius:3px}
+#carpet svg{position:absolute;inset:0;width:100%;height:100%}
+
+/* Ground grass */
+#ground{
+  width:100%;height:70px;flex-shrink:0;
+  background:linear-gradient(to bottom,var(--gr1),var(--gr2));
+  border-top:2.5px solid #7A9A58;
+  position:relative;z-index:3;
+}
+#ground::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.06) 0%,transparent 60%)}
+
+/* Character enter/exit */
+.enter-r{animation:enterR .58s cubic-bezier(.34,1.4,.64,1) forwards}
+.exit-l{animation:exitL .4s ease-in forwards}
+.do-bounce{animation:bounce .48s ease-out}
+.do-wiggle{animation:wiggle .44s ease-in-out}
+
+/* Stage sparkles */
+.s-star{position:absolute;pointer-events:none;color:var(--terra);opacity:.28;animation:twinkle var(--d,3.5s) var(--dl,0s) ease-in-out infinite;font-size:.72rem}
+
+
+/* ═══════════════════════════════════
+   RESPONSE PANEL
+═══════════════════════════════════ */
+#rpanel{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(255,251,240,.98);
+  border-top:2px solid rgba(201,107,58,.14);
+  border-radius:22px 22px 0 0;
+  padding:14px 16px max(18px,env(safe-area-inset-bottom));
+  display:none;z-index:100;
+  box-shadow:0 -4px 26px rgba(61,43,31,.1);
+}
+#rpanel.show{display:block;animation:slideUp .32s cubic-bezier(.34,1.4,.64,1)}
+.rlbl{font-family:'Nunito',sans-serif;font-weight:900;font-size:.6rem;color:rgba(61,43,31,.36);text-align:center;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.rchoices{display:flex;flex-direction:column;gap:9px}
+.rbtn{
+  background:rgba(201,107,58,.05);
+  border:1.5px solid rgba(201,107,58,.2);
+  border-radius:14px;padding:13px 15px;
+  color:var(--brown);font-family:'Nunito',sans-serif;
+  font-size:.84rem;font-weight:700;
+  text-align:left;cursor:pointer;width:100%;
+  line-height:1.45;-webkit-appearance:none;
+  transition:background .14s,transform .1s;
+}
+.rbtn:active{background:rgba(201,107,58,.13);transform:scale(.98)}
+
+
+/* ═══════════════════════════════════
+   FINALE
+═══════════════════════════════════ */
+#finale{
+  align-items:center;justify-content:center;text-align:center;
+  background:linear-gradient(160deg,var(--sky1) 0%,var(--sky2) 55%,var(--gr1) 100%);
+  overflow:hidden;z-index:40;padding:20px;
+}
+.ftitle{font-size:clamp(2.8rem,11vw,5rem);color:var(--terra);text-shadow:3px 4px 0 rgba(180,60,20,.18);line-height:1.05;z-index:2}
+.fsub{font-family:'Nunito',sans-serif;font-weight:800;color:rgba(61,43,31,.55);font-size:clamp(.82rem,3vw,.96rem);margin-top:10px;max-width:290px;line-height:1.75;z-index:2}
+.f-btn{
+  margin-top:18px;padding:13px 36px;z-index:2;
+  background:linear-gradient(135deg,#C96B3A,#E8832A);
+  border:none;border-radius:50px;color:#fff;
+  font-family:'Fredoka One',cursive;font-size:1.08rem;cursor:pointer;
+  box-shadow:0 5px 0 rgba(140,50,15,.38);
+  -webkit-appearance:none;transition:transform .12s,box-shadow .12s;
+}
+.f-btn:active{transform:translateY(2px);box-shadow:0 3px 0 rgba(140,50,15,.38)}
+#fin-fw{position:absolute;inset:0;pointer-events:none;z-index:1}
+.fw{position:absolute;width:7px;height:7px;border-radius:50%;animation:fwburst 1.1s ease-out forwards}
+#fin-fam{z-index:2;margin-top:12px;animation:finFam .65s .1s both ease-out}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ INTRO ══════════════ -->
+<div id="intro" class="screen active">
+  <div class="geo" style="width:56px;height:56px;background:rgba(201,107,58,.09);border-radius:3px;top:7%;left:4%;--r:18deg;--d:5.5s;--dl:0s"></div>
+  <div class="geo" style="width:42px;height:42px;background:rgba(31,168,150,.07);border-radius:50%;top:11%;right:5%;--r:0deg;--d:4.2s;--dl:.7s"></div>
+  <div class="geo" style="width:68px;height:68px;background:rgba(240,168,48,.07);border-radius:50%;bottom:14%;left:3%;--r:0deg;--d:6s;--dl:1.4s"></div>
+  <div class="geo" style="width:44px;height:44px;background:rgba(201,107,58,.07);border-radius:50%;bottom:11%;right:4%;--r:0deg;--d:4.8s;--dl:.3s"></div>
+  <span class="star" style="top:9%;left:13%;--fs:1.5rem;--d:3.8s;--dl:0s">✦</span>
+  <span class="star" style="top:20%;right:10%;--fs:1rem;--d:4.5s;--dl:.9s;color:#1FA896">✦</span>
+  <span class="star" style="bottom:22%;left:16%;--fs:1.3rem;--d:3.2s;--dl:.5s;color:#F0A830">✦</span>
+
+  <div class="i-lants">
+    <div class="lsw"><svg width="30" height="80" viewBox="0 0 30 80"><line x1="15" y1="0" x2="15" y2="13" stroke="#C96B3A" stroke-width="2"/><ellipse cx="15" cy="13" rx="11" ry="3.8" fill="#A05020"/><path d="M4 16 Q15 18 26 16 L28 51 Q15 56 2 51Z" fill="#C96B3A"/><path d="M5 27 Q15 29 25 27" stroke="rgba(240,168,48,.28)" fill="none" stroke-width="1"/><path d="M4 38 Q15 40 26 38" stroke="rgba(240,168,48,.2)" fill="none" stroke-width="1"/><ellipse cx="15" cy="51" rx="10" ry="4" fill="#8A3A10"/><ellipse cx="15" cy="33" rx="6.5" ry="9.5" fill="rgba(255,210,110,.14)"/><line x1="13" y1="55" x2="11.5" y2="68" stroke="#C96B3A" stroke-width="1.4"/><line x1="15" y1="55" x2="15" y2="70" stroke="#C96B3A" stroke-width="1.4"/><line x1="17" y1="55" x2="18.5" y2="68" stroke="#C96B3A" stroke-width="1.4"/></svg></div>
+    <div class="lsw"><svg width="26" height="72" viewBox="0 0 26 72"><line x1="13" y1="0" x2="13" y2="11" stroke="#1FA896" stroke-width="2"/><ellipse cx="13" cy="11" rx="9.5" ry="3.4" fill="#168878"/><path d="M3 14 Q13 16 23 14 L25 46 Q13 51 1 46Z" fill="#1FA896"/><path d="M3 24 Q13 26 23 24" stroke="rgba(240,168,48,.25)" fill="none" stroke-width="1"/><path d="M3 35 Q13 37 23 35" stroke="rgba(240,168,48,.18)" fill="none" stroke-width="1"/><ellipse cx="13" cy="46" rx="9" ry="3.5" fill="#107060"/><ellipse cx="13" cy="30" rx="5.5" ry="8" fill="rgba(255,210,110,.11)"/><line x1="11" y1="49" x2="9.5" y2="62" stroke="#1FA896" stroke-width="1.4"/><line x1="13" y1="49" x2="13" y2="64" stroke="#1FA896" stroke-width="1.4"/><line x1="15" y1="49" x2="16.5" y2="62" stroke="#1FA896" stroke-width="1.4"/></svg></div>
+    <div class="lsw"><svg width="30" height="80" viewBox="0 0 30 80"><line x1="15" y1="0" x2="15" y2="13" stroke="#F0A830" stroke-width="2"/><ellipse cx="15" cy="13" rx="11" ry="3.8" fill="#D09020"/><path d="M4 16 Q15 18 26 16 L28 51 Q15 56 2 51Z" fill="#F0A830"/><path d="M5 27 Q15 29 25 27" stroke="rgba(255,255,255,.22)" fill="none" stroke-width="1"/><path d="M4 38 Q15 40 26 38" stroke="rgba(255,255,255,.16)" fill="none" stroke-width="1"/><ellipse cx="15" cy="51" rx="10" ry="4" fill="#B07018"/><ellipse cx="15" cy="33" rx="6.5" ry="9.5" fill="rgba(255,230,130,.16)"/><line x1="13" y1="55" x2="11.5" y2="68" stroke="#F0A830" stroke-width="1.4"/><line x1="15" y1="55" x2="15" y2="70" stroke="#F0A830" stroke-width="1.4"/><line x1="17" y1="55" x2="18.5" y2="68" stroke="#F0A830" stroke-width="1.4"/></svg></div>
+  </div>
+
+  <div class="i-moon mflt">
+    <svg viewBox="0 0 88 88" width="70" height="70"><circle cx="44" cy="44" r="41" fill="#F5C840"/><circle cx="61" cy="32" r="32" fill="#FDEBC8"/><circle cx="20" cy="42" r="3.5" fill="rgba(201,107,58,.1)"/><circle cx="28" cy="57" r="2.5" fill="rgba(201,107,58,.08)"/></svg>
+  </div>
+
+  <h1 class="i-title">عید مبارک<br/>🌙 Eid Mubarak</h1>
+  <p class="i-sub">Ek khaas surprise aapka intezaar kar raha hai…</p>
+  <button class="i-btn" onclick="startStory()">🌙 Surprise Shuru Karein</button>
+</div>
+
+
+<!-- ══════════════ SCENE ══════════════ -->
+<div id="scene" class="screen">
+
+  <!-- SKY BAR -->
+  <div id="sky">
+    <div id="dots">
+      <div class="dot" id="d0"></div>
+      <div class="dot" id="d1"></div>
+      <div class="dot" id="d2"></div>
+    </div>
+    <div id="s-moon">
+      <svg viewBox="0 0 52 52" width="40" height="40"><circle cx="26" cy="26" r="24" fill="#F5C840"/><circle cx="36" cy="19" r="19" fill="#FDEBC8"/></svg>
+    </div>
+    <div id="s-lants">
+      <div class="lsw"><svg width="20" height="58" viewBox="0 0 20 58"><line x1="10" y1="0" x2="10" y2="9" stroke="#C96B3A" stroke-width="1.5"/><path d="M2 10 Q10 12 18 10 L20 36 Q10 40 0 36Z" fill="#C96B3A"/><ellipse cx="10" cy="36" rx="8" ry="3" fill="#8A3A10"/><ellipse cx="10" cy="23" rx="4.5" ry="6.5" fill="rgba(255,210,110,.13)"/><line x1="8.5" y1="39" x2="7.5" y2="50" stroke="#C96B3A" stroke-width="1.3"/><line x1="10" y1="39" x2="10" y2="52" stroke="#C96B3A" stroke-width="1.3"/><line x1="11.5" y1="39" x2="12.5" y2="50" stroke="#C96B3A" stroke-width="1.3"/></svg></div>
+      <div class="lsw"><svg width="18" height="54" viewBox="0 0 18 54"><line x1="9" y1="0" x2="9" y2="8" stroke="#F0A830" stroke-width="1.5"/><path d="M1 9 Q9 11 17 9 L18 33 Q9 37 0 33Z" fill="#F0A830"/><ellipse cx="9" cy="33" rx="7" ry="2.8" fill="#B07018"/><ellipse cx="9" cy="21" rx="4" ry="6" fill="rgba(255,230,130,.16)"/><line x1="7.5" y1="36" x2="6.5" y2="47" stroke="#F0A830" stroke-width="1.3"/><line x1="9" y1="36" x2="9" y2="49" stroke="#F0A830" stroke-width="1.3"/><line x1="10.5" y1="36" x2="11.5" y2="47" stroke="#F0A830" stroke-width="1.3"/></svg></div>
+      <div class="lsw"><svg width="20" height="58" viewBox="0 0 20 58"><line x1="10" y1="0" x2="10" y2="9" stroke="#1FA896" stroke-width="1.5"/><path d="M2 10 Q10 12 18 10 L20 36 Q10 40 0 36Z" fill="#1FA896"/><ellipse cx="10" cy="36" rx="8" ry="3" fill="#107060"/><ellipse cx="10" cy="23" rx="4.5" ry="6.5" fill="rgba(255,210,110,.11)"/><line x1="8.5" y1="39" x2="7.5" y2="50" stroke="#1FA896" stroke-width="1.3"/><line x1="10" y1="39" x2="10" y2="52" stroke="#1FA896" stroke-width="1.3"/><line x1="11.5" y1="39" x2="12.5" y2="50" stroke="#1FA896" stroke-width="1.3"/></svg></div>
+    </div>
+  </div>
+
+  <!-- BUBBLE ZONE -->
+  <div id="bubble-zone">
+    <div class="bcard">
+      <div class="bname" id="bname"></div>
+      <div id="btxt" class="caret"></div>
+      <div id="msays"></div>
+      <div class="bfoot">
+        <button id="nxtbtn" onclick="nextLine()">Aage ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE — character + carpet + grass stacked bottom-up -->
+  <div id="stage">
+    <span class="s-star" style="top:14%;left:9%;--d:3.6s;--dl:.3s">✦</span>
+    <span class="s-star" style="top:9%;right:12%;--d:4s;--dl:.8s;color:#F0A830">✦</span>
+
+    <!-- Character sits here, naturally above carpet -->
+    <div id="chip"></div>
+    <div id="char-wrap"></div>
+
+    <!-- Carpet strip -->
+    <div id="carpet">
+      <svg viewBox="0 0 260 56" preserveAspectRatio="none">
+        <rect x="7" y="7" width="246" height="42" fill="none" stroke="rgba(240,168,48,.24)" stroke-width="1.5"/>
+        <rect x="12" y="12" width="236" height="32" fill="none" stroke="rgba(240,168,48,.15)" stroke-width="1"/>
+        <circle cx="13" cy="28" r="12" fill="none" stroke="rgba(240,168,48,.2)" stroke-width="1.5"/>
+        <circle cx="130" cy="28" r="6" fill="none" stroke="rgba(240,168,48,.12)" stroke-width="1"/>
+        <circle cx="18" cy="16" r="5" fill="none" stroke="rgba(240,168,48,.16)" stroke-width="1"/>
+        <circle cx="242" cy="16" r="5" fill="none" stroke="rgba(240,168,48,.16)" stroke-width="1"/>
+        <circle cx="18" cy="40" r="5" fill="none" stroke="rgba(240,168,48,.16)" stroke-width="1"/>
+        <circle cx="242" cy="40" r="5" fill="none" stroke="rgba(240,168,48,.16)" stroke-width="1"/>
+      </svg>
+    </div>
+
+    <!-- Ground -->
+    <div id="ground"></div>
+  </div>
+
+  <!-- Response sheet -->
+  <div id="rpanel">
+    <div class="rlbl">💬 Aap kya kahein gi?</div>
+    <div class="rchoices" id="rchoices"></div>
+  </div>
+</div>
+
+
+<!-- ══════════════ FINALE ══════════════ -->
+<div id="finale" class="screen">
+  <div id="fin-fw"></div>
+  <span class="star" style="position:absolute;top:7%;left:7%;--fs:2rem;--d:3s;--dl:0s;opacity:.1">✦</span>
+  <span class="star" style="position:absolute;top:12%;right:8%;--fs:1.5rem;--d:4s;--dl:.6s;color:#1FA896;opacity:.09">✦</span>
+  <span class="star" style="position:absolute;bottom:14%;left:6%;--fs:1.7rem;--d:2.8s;--dl:1s;color:#F0A830;opacity:.09">✦</span>
+  <div class="mflt" style="filter:drop-shadow(0 0 18px rgba(240,168,48,.65));margin-bottom:8px;z-index:2">
+    <svg viewBox="0 0 88 88" width="64" height="64"><circle cx="44" cy="44" r="41" fill="#F5C840"/><circle cx="61" cy="32" r="32" fill="#FDEBC8"/></svg>
+  </div>
+  <h1 class="ftitle">عید مبارک 🌙</h1>
+  <p class="fsub">Hum teeno appse bohuth pyaar karte hain.<br/> 💝</p>
+  <div id="fin-fam"></div>
+  <button class="f-btn" onclick="location.reload()">🌙 Dobara Dekhein</button>
+</div>
+
+
+<script>
+/* ── SVG HELPERS ── */
+const ey=(cx,cy,rw,rh,c)=>`<ellipse cx="${cx}" cy="${cy}" rx="${rw}" ry="${rh}" fill="white"/><ellipse cx="${cx}" cy="${cy+2}" rx="${rw*.64}" ry="${rh*.74}" fill="${c}"/><ellipse cx="${cx}" cy="${cy+2.5}" rx="${rw*.4}" ry="${rh*.46}" fill="#1A0800"/><circle cx="${cx+rw*.32}" cy="${cy-rh*.28}" r="${rw*.29}" fill="white"/><circle cx="${cx-rw*.2}" cy="${cy+rh*.36}" r="${rw*.14}" fill="rgba(255,255,255,.4)"/>`;
+const ls=(x1,y,x2,w)=>`<path d="M${x1} ${y} Q${(x1+x2)/2} ${y-8} ${x2} ${y}" stroke="#1A0800" fill="none" stroke-width="${w}" stroke-linecap="round"/>`;
+const br=(x1,y,x2,w)=>`<path d="M${x1} ${y} Q${(x1+x2)/2} ${y-7} ${x2} ${y}" stroke="#2A1800" fill="none" stroke-width="${w}" stroke-linecap="round"/>`;
+const sm=(cx,cy,rx,ry,sw)=>`<path d="M${cx-rx} ${cy} Q${cx} ${cy+ry} ${cx+rx} ${cy}" stroke="#C07855" fill="none" stroke-width="${sw}" stroke-linecap="round"/>`;
+const ns=(cx,cy)=>`<path d="M${cx-4} ${cy} Q${cx} ${cy+5} ${cx+4} ${cy}" stroke="#D09070" fill="none" stroke-width="1.5" stroke-linecap="round"/>`;
+const ck=(x1,x2,cy,rx,ry,op)=>`<ellipse cx="${x1}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#FF8F7A" opacity="${op}"/><ellipse cx="${x2}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#FF8F7A" opacity="${op}"/>`;
+
+/* ── CHARACTER SVGS ── */
+function mkJibrael(){
+  const S='#5B9E7A',SD='#4A8A68',sk='#F5C09A';
+  return`<svg viewBox="0 0 140 275" width="106" height="208" xmlns="http://www.w3.org/2000/svg">
+  <path d="M36 108 C22 123 14 154 16 180 L34 176 C31 155 36 132 46 119Z" fill="${S}"/>
+  <path d="M104 108 C118 123 126 154 124 180 L106 176 C109 155 104 132 94 119Z" fill="${S}"/>
+  <path d="M36 108 C25 150 22 202 22 268 L118 268 C118 202 115 150 104 108 Q87 97 70 95 Q53 97 36 108Z" fill="${S}"/>
+  <path d="M49 110 C44 146 42 188 42 232 L68 232 L68 110 Q58 104 49 110Z" fill="rgba(255,255,255,.07)"/>
+  <path d="M56 108 L70 124 L84 108" stroke="${SD}" fill="none" stroke-width="2" stroke-linecap="round"/>
+  <path d="M22 261 L118 261" stroke="${SD}" stroke-width="1.5" stroke-dasharray="4,3" fill="none"/>
+  <ellipse cx="13" cy="183" rx="14" ry="11.5" fill="${sk}"/>
+  <ellipse cx="127" cy="183" rx="14" ry="11.5" fill="${sk}"/>
+  <path d="M57 93 Q70 90 83 93 L83 110 Q70 113 57 110Z" fill="${sk}"/>
+  <circle cx="70" cy="58" r="45" fill="${sk}"/>
+  <path d="M25 58 Q25 13 70 6 Q115 13 115 58" fill="#2A1E18"/>
+  <rect x="23" y="56" width="94" height="12" rx="5" fill="#342416"/>
+  <circle cx="40" cy="43" r="2" fill="#5A4030" opacity=".45"/>
+  <circle cx="70" cy="34" r="2" fill="#5A4030" opacity=".45"/>
+  <circle cx="100" cy="43" r="2" fill="#5A4030" opacity=".45"/>
+  ${ey(52,64,14,12.5,'#3D2000')}
+  ${ey(88,64,14,12.5,'#3D2000')}
+  ${ls(38,58,66,2.8)}${ls(74,58,102,2.8)}
+  ${br(38,50,66,4)}${br(74,50,102,4)}
+  ${ns(70,77)}${sm(70,87,18,18,3.2)}
+  ${ck(36,104,78,13,9,.18)}
+</svg>`;
+}
+function mkHumain(){
+  const S='#5B8EC8',SD='#4A7AB0',sk='#F5C09A';
+  return`<svg viewBox="0 0 130 265" width="98" height="200" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 105 C19 119 12 148 14 172 L30 168 C28 149 33 127 42 116Z" fill="${S}"/>
+  <path d="M98 105 C111 119 118 148 116 172 L100 168 C102 149 97 127 88 116Z" fill="${S}"/>
+  <path d="M32 105 C22 144 20 195 20 258 L110 258 C110 195 108 144 98 105 Q82 93 65 91 Q48 93 32 105Z" fill="${S}"/>
+  <path d="M46 108 C41 140 39 181 39 228 L62 228 L62 108 Q54 102 46 108Z" fill="rgba(255,255,255,.07)"/>
+  <path d="M51 105 L65 121 L79 105" stroke="${SD}" fill="none" stroke-width="2" stroke-linecap="round"/>
+  <path d="M20 251 L110 251" stroke="${SD}" stroke-width="1.5" stroke-dasharray="4,3" fill="none"/>
+  <ellipse cx="11" cy="175" rx="13" ry="11" fill="${sk}"/>
+  <ellipse cx="119" cy="175" rx="13" ry="11" fill="${sk}"/>
+  <path d="M53 89 Q65 86 77 89 L77 105 Q65 108 53 105Z" fill="${sk}"/>
+  <circle cx="65" cy="54" r="42" fill="${sk}"/>
+  <path d="M23 54 Q23 12 65 5 Q107 12 107 54" fill="#2A1E18"/>
+  <rect x="21" y="52" width="88" height="11" rx="5" fill="#342416"/>
+  <circle cx="36" cy="39" r="2" fill="#5A4030" opacity=".45"/>
+  <circle cx="65" cy="30" r="2" fill="#5A4030" opacity=".45"/>
+  <circle cx="94" cy="39" r="2" fill="#5A4030" opacity=".45"/>
+  ${ey(47,59,15,14,'#3D2000')}
+  ${ey(83,59,15,14,'#3D2000')}
+  ${ls(32,52,62,2.8)}${ls(68,52,98,2.8)}
+  ${br(32,43,62,3.6)}${br(68,43,98,3.6)}
+  ${ns(65,74)}${sm(65,84,20,20,3.2)}
+  ${ck(30,100,70,14,10,.22)}
+</svg>`;
+}
+function mkInaya(){
+  const D='#F4A0B5',DD='#E8789A',T='#1FA896',TD='#18928A',sk='#F5C09A';
+  return`<svg viewBox="0 0 118 255" width="88" height="190" xmlns="http://www.w3.org/2000/svg">
+  <path d="M18 107 C7 119 2 140 4 158 L18 154 C16 140 20 124 28 113Z" fill="${D}"/>
+  <path d="M100 107 C111 119 116 140 114 158 L100 154 C102 140 98 124 90 113Z" fill="${D}"/>
+  <path d="M18 107 C10 142 8 188 8 246 L110 246 C110 188 108 142 100 107 Q80 95 59 93 Q38 95 18 107Z" fill="${D}"/>
+  <path d="M30 110 C26 140 24 178 24 220 L50 220 L50 110 Q40 104 30 110Z" fill="rgba(255,255,255,.07)"/>
+  <path d="M8 230 Q34 222 59 225 Q84 222 110 230 L110 246 L8 246Z" fill="${DD}"/>
+  <circle cx="44" cy="148" r="4" fill="rgba(255,255,255,.3)"/>
+  <circle cx="76" cy="162" r="3" fill="rgba(255,255,255,.24)"/>
+  <circle cx="58" cy="176" r="2.5" fill="rgba(255,255,255,.2)"/>
+  <ellipse cx="2" cy="161" rx="10.5" ry="9.5" fill="${sk}"/>
+  <ellipse cx="116" cy="161" rx="10.5" ry="9.5" fill="${sk}"/>
+  <path d="M8 95 Q14 134 59 141 Q104 134 110 95 Q100 120 86 128 Q72 138 59 140 Q46 138 32 128 Q18 120 8 95Z" fill="${T}"/>
+  <path d="M49 92 Q59 89 69 92 L69 108 Q59 110 49 108Z" fill="${sk}"/>
+  <circle cx="59" cy="54" r="39" fill="${sk}"/>
+  <path d="M20 54 Q20 15 59 8 Q98 15 98 54 Q94 34 59 28 Q24 34 20 54Z" fill="${T}"/>
+  <path d="M20 54 Q17 68 20 80 Q26 96 59 99 Q92 96 98 80 Q101 68 98 54" fill="${T}"/>
+  <ellipse cx="59" cy="62" rx="27" ry="31" fill="${sk}"/>
+  <path d="M20 54 Q59 48 98 54" stroke="${TD}" fill="none" stroke-width="2"/>
+  <text x="22" y="40" font-size="12" fill="#F5C840" opacity=".68">✦</text>
+  <text x="66" y="36" font-size="10" fill="#F5C840" opacity=".58">✦</text>
+  <text x="34" y="26" font-size="8" fill="#F5C840" opacity=".45">✦</text>
+  ${ey(45,62,13,13.5,'#3D2000')}
+  ${ey(73,62,13,13.5,'#3D2000')}
+  ${ls(32,55,58,2.4)}${ls(60,55,86,2.4)}
+  ${br(33,49,57,2.2)}${br(61,49,85,2.2)}
+  ${ns(59,76)}${sm(59,86,17,18,2.8)}
+  ${ck(28,90,74,11,8,.3)}
+</svg>`;
+}
+
+function mkFamily(){
+  const sk='#F5C09A';
+  return`<svg viewBox="0 0 290 175" width="min(290px,82vw)" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="145" cy="173" rx="136" ry="6" fill="rgba(0,0,0,.07)"/>
+  <g transform="translate(0,12) scale(0.56)">
+    <path d="M36 108 C22 123 14 154 16 180 L34 176 C31 155 36 132 46 119Z" fill="#5B9E7A"/><path d="M104 108 C118 123 126 154 124 180 L106 176 C109 155 104 132 94 119Z" fill="#5B9E7A"/><path d="M36 108 C25 150 22 202 22 268 L118 268 C118 202 115 150 104 108 Q87 97 70 95 Q53 97 36 108Z" fill="#5B9E7A"/>
+    <ellipse cx="13" cy="183" rx="14" ry="11.5" fill="${sk}"/><ellipse cx="127" cy="183" rx="14" ry="11.5" fill="${sk}"/>
+    <path d="M57 93 Q70 90 83 93 L83 110 Q70 113 57 110Z" fill="${sk}"/>
+    <circle cx="70" cy="58" r="45" fill="${sk}"/><path d="M25 58 Q25 13 70 6 Q115 13 115 58" fill="#2A1E18"/><rect x="23" y="56" width="94" height="12" rx="5" fill="#342416"/>
+    <ellipse cx="52" cy="64" rx="14" ry="12.5" fill="white"/><ellipse cx="52" cy="66" rx="9" ry="9.5" fill="#3D2000"/><circle cx="57" cy="62" r="3.5" fill="white"/>
+    <ellipse cx="88" cy="64" rx="14" ry="12.5" fill="white"/><ellipse cx="88" cy="66" rx="9" ry="9.5" fill="#3D2000"/><circle cx="93" cy="62" r="3.5" fill="white"/>
+    <path d="M38 50 Q52 43 66 50" stroke="#2A1800" fill="none" stroke-width="4" stroke-linecap="round"/><path d="M74 50 Q88 43 102 50" stroke="#2A1800" fill="none" stroke-width="4" stroke-linecap="round"/>
+    <path d="M52 87 Q70 106 88 87" stroke="#C07855" fill="none" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="36" cy="78" rx="13" ry="9" fill="#FF8F7A" opacity=".16"/><ellipse cx="104" cy="78" rx="13" ry="9" fill="#FF8F7A" opacity=".16"/>
+  </g>
+  <g transform="translate(100,16) scale(0.52)">
+    <path d="M32 105 C19 119 12 148 14 172 L30 168 C28 149 33 127 42 116Z" fill="#5B8EC8"/><path d="M98 105 C111 119 118 148 116 172 L100 168 C102 149 97 127 88 116Z" fill="#5B8EC8"/><path d="M32 105 C22 144 20 195 20 258 L110 258 C110 195 108 144 98 105 Q82 93 65 91 Q48 93 32 105Z" fill="#5B8EC8"/>
+    <ellipse cx="11" cy="175" rx="13" ry="11" fill="${sk}"/><ellipse cx="119" cy="175" rx="13" ry="11" fill="${sk}"/>
+    <path d="M53 89 Q65 86 77 89 L77 105 Q65 108 53 105Z" fill="${sk}"/>
+    <circle cx="65" cy="54" r="42" fill="${sk}"/><path d="M23 54 Q23 12 65 5 Q107 12 107 54" fill="#2A1E18"/><rect x="21" y="52" width="88" height="11" rx="5" fill="#342416"/>
+    <ellipse cx="47" cy="59" rx="15" ry="14" fill="white"/><ellipse cx="47" cy="61" rx="9.5" ry="10.5" fill="#3D2000"/><circle cx="52" cy="57" r="4.5" fill="white"/>
+    <ellipse cx="83" cy="59" rx="15" ry="14" fill="white"/><ellipse cx="83" cy="61" rx="9.5" ry="10.5" fill="#3D2000"/><circle cx="88" cy="57" r="4.5" fill="white"/>
+    <path d="M32 43 Q47 36 62 43" stroke="#2A1800" fill="none" stroke-width="3.6" stroke-linecap="round"/><path d="M68 43 Q83 36 98 43" stroke="#2A1800" fill="none" stroke-width="3.6" stroke-linecap="round"/>
+    <path d="M45 84 Q65 104 85 84" stroke="#C07855" fill="none" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="30" cy="70" rx="14" ry="10" fill="#FF8F7A" opacity=".18"/><ellipse cx="100" cy="70" rx="14" ry="10" fill="#FF8F7A" opacity=".18"/>
+  </g>
+  <g transform="translate(196,20) scale(0.5)">
+    <path d="M18 107 C7 119 2 140 4 158 L18 154 C16 140 20 124 28 113Z" fill="#F4A0B5"/><path d="M100 107 C111 119 116 140 114 158 L100 154 C102 140 98 124 90 113Z" fill="#F4A0B5"/><path d="M18 107 C10 142 8 188 8 246 L110 246 C110 188 108 142 100 107 Q80 95 59 93 Q38 95 18 107Z" fill="#F4A0B5"/>
+    <path d="M8 230 Q34 222 59 225 Q84 222 110 230 L110 246 L8 246Z" fill="#E8789A"/>
+    <ellipse cx="2" cy="161" rx="10.5" ry="9.5" fill="${sk}"/><ellipse cx="116" cy="161" rx="10.5" ry="9.5" fill="${sk}"/>
+    <path d="M8 95 Q14 134 59 141 Q104 134 110 95 Q100 120 86 128 Q72 138 59 140 Q46 138 32 128 Q18 120 8 95Z" fill="#1FA896"/>
+    <path d="M49 92 Q59 89 69 92 L69 108 Q59 110 49 108Z" fill="${sk}"/>
+    <circle cx="59" cy="54" r="39" fill="${sk}"/>
+    <path d="M20 54 Q20 15 59 8 Q98 15 98 54 Q94 34 59 28 Q24 34 20 54Z" fill="#1FA896"/>
+    <path d="M20 54 Q17 68 20 80 Q26 96 59 99 Q92 96 98 80 Q101 68 98 54" fill="#1FA896"/>
+    <ellipse cx="59" cy="62" rx="27" ry="31" fill="${sk}"/>
+    <path d="M20 54 Q59 48 98 54" stroke="#18928A" fill="none" stroke-width="2"/>
+    <text x="22" y="40" font-size="12" fill="#F5C840" opacity=".68">✦</text>
+    <ellipse cx="45" cy="62" rx="13" ry="13.5" fill="white"/><ellipse cx="45" cy="64" rx="8.5" ry="10" fill="#3D2000"/><circle cx="50" cy="60" r="4" fill="white"/>
+    <ellipse cx="73" cy="62" rx="13" ry="13.5" fill="white"/><ellipse cx="73" cy="64" rx="8.5" ry="10" fill="#3D2000"/><circle cx="78" cy="60" r="4" fill="white"/>
+    <path d="M33 49 Q45 42 57 49" stroke="#2A1800" fill="none" stroke-width="2.2" stroke-linecap="round"/><path d="M61 49 Q73 42 85 49" stroke="#2A1800" fill="none" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M42 87 Q59 106 76 87" stroke="#C07855" fill="none" stroke-width="2.8" stroke-linecap="round"/>
+    <ellipse cx="28" cy="74" rx="11" ry="8" fill="#FF8F7A" opacity=".26"/><ellipse cx="90" cy="74" rx="11" ry="8" fill="#FF8F7A" opacity=".26"/>
+  </g>
+  <text x="75" y="20" font-size="12" fill="#F0A830" opacity=".6">✦</text>
+  <text x="162" y="14" font-size="10" fill="#1FA896" opacity=".55">✦</text>
+  <text x="255" y="22" font-size="10" fill="#C96B3A" opacity=".5">✦</text>
+</svg>`;
+}
+
+/* ── DATA ── */
+const CHARS = {
+  jibrael:{
+    label:'JIBRAEL', name:'Jibrael kehta hai:', svg:mkJibrael(),
+    lines:[
+      "Ammmmmi! Eid Mubarak! 🌙 Aaj ka din bilkul aap jaise khaas lagta hai!",
+      "Main ne Eid ki namaaz padhi aaj — Allah se sirf aapke liye dua ki. 🤲",
+      "Aap duniya ki best Ammi hain… aur Eidi bhi milegi na? 😄"
+    ],
+    opts:[
+      "Mashallah mera beta! Hug pehle, Eidi baad mein! 🤗",
+      "SubhanAllah! Namaaz padhi?! Mujhe itna fakhr ho gaya! 🤲"
+    ],
+    react:[
+      "Yayyy!! Ammi BEST hain!! *bhaag ke hug deta hai* 🎉",
+      "Ameen! Aur Eidi?? 😄 Eid Mubarak Ammi🌙"
+    ]
+  },
+  humain:{
+    label:'HUMAIN', name:'Humain kehta hai:', svg:mkHumain(),
+    lines:[
+      "Ammiiiiii! Eid Mubaraaaaak!! 🎉🎊 ",
+      "Ammi Ammi Ammi! Sunoo sunoo! Ammi... eiiiidi kitta dete manje??",
+      "Ammi, aap meri favourite hain! Bilkul sach mein! Eidi? 🥺"
+    ],
+    opts:[
+      "Hahaha! Tu mujhe hamesha hasata hai! Eid Mubarak mere pagal bete! 😄",
+      "Favourite? Toh Eidi nahi milegi! 😉 Aa — Eid Mubarak ☀️"
+    ],
+    react:[
+      "Hehehe! Ammi BEST hain!! EID MUBARAK!! 😂🎉",
+      "Nahi Ammi nahi!! 😭 …Eid Mubarak anyway! Eidi zaroor! 😄"
+    ]
+  },
+  inaya:{
+    label:'INAYA', name:'Inaya kehti hai:', svg:mkInaya(),
+    lines:[
+      "Ammiiii! 🌸 Eid Mubaaaaak!! Main bahut bahut excited hoon!! ✨",
+      " Maine Abbu se bola tha ke mera hijab bilkul aap jaisa banao! Abbu ne bana diya! ✨  Main princess lagrahi hoon na? 👸",
+      "Ammi… main aapko itna pyaar karti hoon… *chote haath failati hai* 🥰"
+    ],
+    opts:[
+      "Meri gudiya! Mashallah sachchi princess! Aa hug do Ammi ko! 👸🤗",
+      "Ammi tumhe isse bhi zyada pyaar karti hai! ❤️"
+    ],
+    react:[
+      "*ghoomti hai* 💃 Ammi ne kaha princess!! Yayyy!!",
+      "Isse bhi zyada?! 😲 Abbu mujhe isse bhi zyada pyar karthe hein💕"
+    ]
+  }
+};
+const ORDER = ['jibrael','humain','inaya'];
+
+/* ── STATE ── */
+let ci=0, li=0, typing=false, tyTmr=null, picking=false;
+const $=id=>document.getElementById(id);
+
+/* ── UTILS ── */
+function doBounce(){
+  const s=$('char-svg');if(!s)return;
+  s.classList.remove('do-bounce');void s.offsetWidth;
+  s.classList.add('do-bounce');
+  setTimeout(()=>s.classList.remove('do-bounce'),500);
+}
+function doWiggle(){
+  const s=$('char-svg');if(!s)return;
+  s.classList.remove('do-wiggle');void s.offsetWidth;
+  s.classList.add('do-wiggle');
+  setTimeout(()=>s.classList.remove('do-wiggle'),460);
+}
+function typeText(el,text,cb){
+  clearInterval(tyTmr);el.textContent='';let i=0;
+  tyTmr=setInterval(()=>{
+    if(i<text.length){el.textContent+=text[i++]}
+    else{clearInterval(tyTmr);cb&&cb()}
+  },24);
+}
+function hidePanel(){const p=$('rpanel');p.className='';p.style.display='none'}
+function showPanel(){const p=$('rpanel');p.style.display='block';requestAnimationFrame(()=>p.classList.add('show'))}
+function hideMsays(){const m=$('msays');m.className='';m.style.display='none'}
+function showMsays(t){const m=$('msays');m.textContent=t;m.style.display='block';requestAnimationFrame(()=>m.classList.add('show'))}
+
+/* ── FLOW ── */
+function startStory(){
+  $('intro').classList.remove('active');
+  $('scene').classList.add('active');
+  loadChar(0);
+}
+
+function loadChar(idx){
+  ci=idx; li=0; picking=false;
+  const key=ORDER[idx], ch=CHARS[key];
+  // progress dots
+  for(let i=0;i<3;i++){
+    const d=$('d'+i); d.className='dot';
+    if(i<idx) d.classList.add('done');
+    else if(i===idx) d.classList.add('active');
+  }
+  hidePanel(); hideMsays();
+  const bz=$('bubble-zone'); bz.style.opacity='0';
+  const chip=$('chip'); chip.className=''; chip.textContent='';
+  // render character
+  $('char-wrap').innerHTML=`<div id="char-svg" class="enter-r" style="filter:drop-shadow(0 6px 14px rgba(0,0,0,.12))">${ch.svg}</div>`;
+  setTimeout(()=>{
+    chip.textContent=ch.label; chip.classList.add('vis');
+    $('bname').textContent=ch.name;
+    bz.style.opacity='1';
+    setTimeout(showLine,180);
+  },500);
+}
+
+function showLine(){
+  clearInterval(tyTmr);
+  hidePanel(); hideMsays();
+  const txt=$('btxt'), nxt=$('nxtbtn');
+  txt.textContent=''; txt.classList.add('caret'); nxt.classList.remove('show');
+  typing=true;
+  typeText(txt, CHARS[ORDER[ci]].lines[li], ()=>{
+    typing=false; txt.classList.remove('caret');
+    nxt.classList.add('show'); doBounce();
+  });
+}
+
+function nextLine(){
+  if(typing){
+    clearInterval(tyTmr);
+    const ch=CHARS[ORDER[ci]], t=$('btxt');
+    t.textContent=ch.lines[li]; t.classList.remove('caret');
+    typing=false; $('nxtbtn').classList.add('show'); return;
+  }
+  li++;
+  if(li < CHARS[ORDER[ci]].lines.length) showLine();
+  else{ $('nxtbtn').classList.remove('show'); showOptions(); }
+}
+
+function showOptions(){
+  const ch=CHARS[ORDER[ci]], rc=$('rchoices');
+  rc.innerHTML='';
+  ch.opts.forEach((opt,i)=>{
+    const b=document.createElement('button'); b.className='rbtn'; b.textContent=opt;
+    b.onclick=()=>pickOption(i); rc.appendChild(b);
+  });
+  showPanel();
+}
+
+function pickOption(idx){
+  if(picking) return; picking=true;
+  const ch=CHARS[ORDER[ci]];
+  hidePanel();
+  showMsays(ch.opts[idx]);
+  doWiggle();
+  const txt=$('btxt'); txt.textContent=''; txt.classList.add('caret');
+  typing=true;
+  typeText(txt, ch.react[idx], ()=>{
+    typing=false; txt.classList.remove('caret');
+    setTimeout(()=>{
+      const s=$('char-svg'); if(s) s.classList.add('exit-l');
+      $('chip').classList.remove('vis');
+      hideMsays();
+      setTimeout(()=>{
+        if(ci+1 < ORDER.length) loadChar(ci+1); else showFinale();
+      },460);
+    },2100);
+  });
+}
+
+function showFinale(){
+  $('scene').classList.remove('active');
+  $('finale').classList.add('active');
+  $('fin-fam').innerHTML=mkFamily();
+  [280,950,1750,2550,3350].forEach(d=>setTimeout(firework,d));
+}
+
+function firework(){
+  const fw=$('fin-fw');
+  const cols=['#F0A830','#C96B3A','#1FA896','#E87FA0','#5B9E7A','#F5C840','#5B8EC8','white','#FFD08A'];
+  const cx=Math.random()*window.innerWidth, cy=Math.random()*window.innerHeight*.46;
+  for(let i=0;i<18;i++){
+    const p=document.createElement('div'); p.className='fw';
+    const a=(i/18)*Math.PI*2, d=50+Math.random()*80;
+    p.style.cssText=`left:${cx}px;top:${cy}px;background:${cols[~~(Math.random()*cols.length)]};--fx:${(Math.cos(a)*d).toFixed(1)}px;--fy:${(Math.sin(a)*d).toFixed(1)}px;animation-delay:${(Math.random()*.16).toFixed(2)}s`;
+    fw.appendChild(p); setTimeout(()=>p.remove(),1300);
+  }
+}
+</script>
+</body>
+</html>
